@@ -16,6 +16,10 @@ library in the future.
 - It features a simple framebuffer, where its control byte is embedded at the first position
 - Uses /dev/i2c-1 device to communicate to the display
 
+## Images
+![img1](assets/images/img6.jpg)
+![img2](assets/images/img2.jpg)
+
 ## Project Usage 
 
 ### Requirements
@@ -68,3 +72,4 @@ and compile by linking libOmega_SSD1306.a accordingly to your prefered compiler
 
  
 
+# Omega_SSD1306
