@@ -1,4 +1,4 @@
-# Omega_SSD1306 Documentation Page
+# Omega_SSD1306 Documentation
 
 All examples can be found at examples/ folder in the project's root.
 
@@ -104,7 +104,7 @@ int main(){
 #### transparent_text_display(const char* text, int x, int y);
 It's basically the same as text_display, but it will not draw the black background
 behind each character cell, useful if you don't want black squares over your renders, usage is
-exactly the same as the previous function.
+exactly the same as text_display().
 
 Example: 
 
@@ -202,8 +202,8 @@ int main(){
     flush_display();
     }
 ```
-####triangle_display(int x1, int y1, int x2, int y2, int x3, int y3);
-Draws a triangle connecting the three given coordinates.
+#### triangle_display(int x1, int y1, int x2, int y2, int x3, int y3);
+Draws a triangle by connecting the three given coordinates.
 
 Example:
 ```cpp
@@ -235,39 +235,7 @@ int main(){
 
 
 
+## License
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+* **Code:** Licensed under the [GNU Lesser General Public License v3.0](COPYING.LESSER) (LGPL-3.0).
+* **Documentation:** Licensed under [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0).
