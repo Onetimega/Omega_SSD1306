@@ -53,7 +53,7 @@ from build/ and include/ folder to your own project.
 In your program, you include the library using: 
 
 ```cpp
-#include "Omega_SSD1306.h"
+#include "include/Omega_SSD1306.h"
 ```
 and compile by linking libOmega_SSD1306.a accordingly to your prefered compiler
 (remember to properly format your #include line depending on your project's file tree.
