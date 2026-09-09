@@ -18,27 +18,28 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-//#include <stdexcept>
+
 
 #include <chrono>
 #include <thread>
-//#include <time.h>
+
 #include <utility>
 
 
 static int fd = open("/dev/i2c-1", O_RDWR);
 
+int alpha_fd = fd;
 
 uint8_t framebuffer[1025] = {0};
 
 
 static unsigned char initBytes[26] = {
-        0x00, 0xAE, 0xA8, 0x3F, 0xD3,
-        0x00, 0x40, 0xA1, 0xC8, 0xDA,
-        0x12, 0x81, 0x7F, 0xA4, 0xA6,
-        0xD5, 0x80, 0x8D, 0x14, 0xD9,
-        0x22, 0xD8, 0x30, 0x20, 0x00,
-        0xAF
+    0x00, 0xAE, 0xA8, 0x3F, 0xD3,
+    0x00, 0x40, 0xA1, 0xC8, 0xDA,
+    0x12, 0x81, 0x7F, 0xA4, 0xA6,
+    0xD5, 0x80, 0x8D, 0x14, 0xD9,
+    0x22, 0xD8, 0x30, 0x20, 0x00,
+    0xAF
 };
 
 static const uint8_t Unknown_char[8] = {0x00, 0x66, 0x5a, 0x24, 0x24, 0x5a, 0x66, 0x00};         //0
@@ -106,11 +107,11 @@ static const uint8_t Y [8] = {0x00, 0x02, 0x04, 0x08, 0x78, 0x04, 0x02, 0x00};  
 static const uint8_t Z [8] = {0x00, 0x62, 0x52, 0x52, 0x4a, 0x4a, 0x46, 0x00};                   //90
 
 static const uint8_t open_bracket [8] = {0x00, 0x00, 0x00, 0x7e, 0x42, 0x00, 0x00, 0x00};        //91
-static const uint8_t backslash [8] = {0x00, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x00};//92
+static const uint8_t backslash [8] = {0x00, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x00};           //92
 static const uint8_t close_bracket [8] = {0x00, 0x00, 0x00, 0x42, 0x7e, 0x00, 0x00, 0x00};       //93
-static const uint8_t caret_circumflex [8] = {0x00, 0x08, 0x04, 0x02, 0x04, 0x08, 0x00, 0x00};//94
+static const uint8_t caret_circumflex [8] = {0x00, 0x08, 0x04, 0x02, 0x04, 0x08, 0x00, 0x00};    //94
 static const uint8_t underscore [8] = {0x00, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x00};          //95
-static const uint8_t grave_accent [8] = {0x00, 0x02, 0x04, 0x08, 0x00, 0x00, 0x00, 0x00};//96
+static const uint8_t grave_accent [8] = {0x00, 0x02, 0x04, 0x08, 0x00, 0x00, 0x00, 0x00};        //96
 
 static const uint8_t a [8] = {0x00, 0x7c, 0x12, 0x12, 0x12, 0x12, 0x7c, 0x00};                   //97
 static const uint8_t b [8] = {0x00, 0x7e, 0x4a, 0x4a, 0x4a, 0x4a, 0x34, 0x00};                   //98
@@ -141,7 +142,7 @@ static const uint8_t z [8] = {0x00, 0x62, 0x52, 0x52, 0x4a, 0x4a, 0x46, 0x00};  
 
 
 struct ascii_chars {
-       const uint8_t* characters[128];
+    const uint8_t* characters[128];
 };
 
 
@@ -149,103 +150,103 @@ ascii_chars indexes = {};
 
 
 void init_ascii() {
-        indexes.characters[0] = Unknown_char;
-        indexes.characters[32] = space;
-        indexes.characters[33] = exclamation_mark;
-        indexes.characters[34] = double_quotes;
-        indexes.characters[35] = number_sign;
-        indexes.characters[36] = dollar;
-        indexes.characters[37] = percent_sign;
-        indexes.characters[38] = ampersand;
-        indexes.characters[39] = single_quote; 
-        indexes.characters[40] = open_parenthesis;
-        indexes.characters[41] = close_parenthesis;
-        indexes.characters[42] = asterisk;
-        indexes.characters[43] = plus;
-        indexes.characters[44] = comma;
-        indexes.characters[45] = hyphen_minus;
-        indexes.characters[46] = dot;
-        indexes.characters[47] = diagonal;
-         
-        indexes.characters[48] = zero;
-        indexes.characters[49] = one;
-        indexes.characters[50] = two;
-        indexes.characters[51] = three;
-        indexes.characters[52] = four;
-        indexes.characters[53] = five;
-        indexes.characters[54] = six;
-        indexes.characters[55] = seven;
-        indexes.characters[56] = eight;
-        indexes.characters[57] = nine;
-        
-        indexes.characters[58] = colon;
-        indexes.characters[59] = semicolon;
-        indexes.characters[60] = less_than;
-        indexes.characters[61] = equal;
-        indexes.characters[62] = greater_than;
-        indexes.characters[63] = question;
-        indexes.characters[64] = AT_sign;   //@
-        
-        indexes.characters[65] = A;
-        indexes.characters[66] = B;
-        indexes.characters[67] = C;
-        indexes.characters[68] = D;
-        indexes.characters[69] = E;
-        indexes.characters[70] = F;
-        indexes.characters[71] = G;
-        indexes.characters[72] = H;
-        indexes.characters[73] = I;
-        indexes.characters[74] = J;
-        indexes.characters[75] = K;
-        indexes.characters[76] = L;
-        indexes.characters[77] = M;
-        indexes.characters[78] = N;
-        indexes.characters[79] = O;
-        indexes.characters[80] = P;
-        indexes.characters[81] = Q;
-        indexes.characters[82] = R;
-        indexes.characters[83] = S;
-        indexes.characters[84] = T;
-        indexes.characters[85] = U;
-        indexes.characters[86] = V;
-        indexes.characters[87] = W;
-        indexes.characters[88] = X;
-        indexes.characters[89] = Y;
-        indexes.characters[90] = Z;
+    indexes.characters[0] = Unknown_char;
+    indexes.characters[32] = space;
+    indexes.characters[33] = exclamation_mark;
+    indexes.characters[34] = double_quotes;
+    indexes.characters[35] = number_sign;
+    indexes.characters[36] = dollar;
+    indexes.characters[37] = percent_sign;
+    indexes.characters[38] = ampersand;
+    indexes.characters[39] = single_quote; 
+    indexes.characters[40] = open_parenthesis;
+    indexes.characters[41] = close_parenthesis;
+    indexes.characters[42] = asterisk;
+    indexes.characters[43] = plus;
+    indexes.characters[44] = comma;
+    indexes.characters[45] = hyphen_minus;
+    indexes.characters[46] = dot;
+    indexes.characters[47] = diagonal;
 
-        indexes.characters[91] = open_bracket;
-        indexes.characters[92] = backslash;
-        indexes.characters[93] = close_bracket;
-        indexes.characters[94] = caret_circumflex;
-        indexes.characters[95] = underscore;
-        indexes.characters[96] = grave_accent;
+    indexes.characters[48] = zero;
+    indexes.characters[49] = one;
+    indexes.characters[50] = two;
+    indexes.characters[51] = three;
+    indexes.characters[52] = four;
+    indexes.characters[53] = five;
+    indexes.characters[54] = six;
+    indexes.characters[55] = seven;
+    indexes.characters[56] = eight;
+    indexes.characters[57] = nine;
 
-        indexes.characters[97] = a;
-        indexes.characters[98] = b;
-        indexes.characters[99] = c;
-        indexes.characters[100] = d;
-        indexes.characters[101] = e;
-        indexes.characters[102] = f;
-        indexes.characters[103] = g;
-        indexes.characters[104] = h;
-        indexes.characters[105] = i;
-        indexes.characters[106] = j;
-        indexes.characters[107] = k;
-        indexes.characters[108] = l;
-        indexes.characters[109] = m;
-        indexes.characters[110] = n;
-        indexes.characters[111] = o;
-        indexes.characters[112] = p;
-        indexes.characters[113] = q;
-        indexes.characters[114] = r;
-        indexes.characters[115] = s;
-        indexes.characters[116] = t;
-        indexes.characters[117] = u;
-        indexes.characters[118] = v;
-        indexes.characters[119] = w;
-        indexes.characters[120] = x;
-        indexes.characters[121] = y;
-        indexes.characters[122] = z;        
+    indexes.characters[58] = colon;
+    indexes.characters[59] = semicolon;
+    indexes.characters[60] = less_than;
+    indexes.characters[61] = equal;
+    indexes.characters[62] = greater_than;
+    indexes.characters[63] = question;
+    indexes.characters[64] = AT_sign;   //@
+
+    indexes.characters[65] = A;
+    indexes.characters[66] = B;
+    indexes.characters[67] = C;
+    indexes.characters[68] = D;
+    indexes.characters[69] = E;
+    indexes.characters[70] = F;
+    indexes.characters[71] = G;
+    indexes.characters[72] = H;
+    indexes.characters[73] = I;
+    indexes.characters[74] = J;
+    indexes.characters[75] = K;
+    indexes.characters[76] = L;
+    indexes.characters[77] = M;
+    indexes.characters[78] = N;
+    indexes.characters[79] = O;
+    indexes.characters[80] = P;
+    indexes.characters[81] = Q;
+    indexes.characters[82] = R;
+    indexes.characters[83] = S;
+    indexes.characters[84] = T;
+    indexes.characters[85] = U;
+    indexes.characters[86] = V;
+    indexes.characters[87] = W;
+    indexes.characters[88] = X;
+    indexes.characters[89] = Y;
+    indexes.characters[90] = Z;
+
+    indexes.characters[91] = open_bracket;
+    indexes.characters[92] = backslash;
+    indexes.characters[93] = close_bracket;
+    indexes.characters[94] = caret_circumflex;
+    indexes.characters[95] = underscore;
+    indexes.characters[96] = grave_accent;
+
+    indexes.characters[97] = a;
+    indexes.characters[98] = b;
+    indexes.characters[99] = c;
+    indexes.characters[100] = d;
+    indexes.characters[101] = e;
+    indexes.characters[102] = f;
+    indexes.characters[103] = g;
+    indexes.characters[104] = h;
+    indexes.characters[105] = i;
+    indexes.characters[106] = j;
+    indexes.characters[107] = k;
+    indexes.characters[108] = l;
+    indexes.characters[109] = m;
+    indexes.characters[110] = n;
+    indexes.characters[111] = o;
+    indexes.characters[112] = p;
+    indexes.characters[113] = q;
+    indexes.characters[114] = r;
+    indexes.characters[115] = s;
+    indexes.characters[116] = t;
+    indexes.characters[117] = u;
+    indexes.characters[118] = v;
+    indexes.characters[119] = w;
+    indexes.characters[120] = x;
+    indexes.characters[121] = y;
+    indexes.characters[122] = z;        
 
 }
 
@@ -262,30 +263,30 @@ void init_ascii() {
 
 
 void contrast_set(uint8_t value){
-        if(value>=0){
-                if(value>255){
-                        value = 255;
-                }
-
-                uint8_t payload[3]{0x00, 0x81, value};
-                write(fd, payload, 3);
+    if(value>=0){
+        if(value>255){
+            value = 255;
         }
+
+        uint8_t payload[3]{0x00, 0x81, value};
+        write(fd, payload, 3);
+    }
 }
 
 
 
 void clear_display(){
-        uint8_t empty_bytes[1025] = {0};
+    uint8_t empty_bytes[1025] = {0};
 
-        memcpy(framebuffer, empty_bytes, 1025);
-        framebuffer[0] = 0x40;
-        write(fd, framebuffer, 1025);
+    memcpy(framebuffer, empty_bytes, 1025);
+    framebuffer[0] = 0x40;
+    write(fd, framebuffer, 1025);
 }
 
 void fb_clear_display(){
     uint8_t empty_bytes[1024] = {0};
     memcpy(&framebuffer[1], empty_bytes, 1024);
-    
+
 }
 
 
@@ -293,21 +294,21 @@ void fb_clear_display(){
 
 void flush_display(){
 
-        framebuffer[0] = 0x40;
-        write(fd, framebuffer, 1025);
+    framebuffer[0] = 0x40;
+    write(fd, framebuffer, 1025);
 
 }
 
 
 void flush_command(){
-        uint8_t payload{};
+    uint8_t payload{};
 }
 
 
 
 
 static void delay(int time_delay){
-        std::this_thread::sleep_for(std::chrono::milliseconds(time_delay));
+    std::this_thread::sleep_for(std::chrono::milliseconds(time_delay));
 }
 
 
@@ -331,47 +332,47 @@ int init_i2c_display(int address){
 
 void text_display(const char* text_input, int x, int y){
 
-        if(y > 7) { y = 7; }
-        if(x > 15) { x = 15; }
+    if(y > 7) { y = 7; }
+    if(x > 15) { x = 15; }
 
-         if(y < 0) { y = 0; }
-        if(x < 0) { x = 0; }
- 
-
-        int string_length = 16;
-        char text_chars[string_length] = {};
-
-        strncpy(text_chars, text_input, 15);
-        text_chars[15] = '\0';
+    if(y < 0) { y = 0; }
+    if(x < 0) { x = 0; }
 
 
-        int cell_x = x * 8;
-        int cell_y = y * 128;
+    int string_length = 16;
+    char text_chars[string_length] = {};
+
+    strncpy(text_chars, text_input, 15);
+    text_chars[15] = '\0';
+
+
+    int cell_x = x * 8;
+    int cell_y = y * 128;
 
 
 
-        for (int i = 0; text_chars[i] != '\0'; ++i){
-                if(cell_x > 127) break;
-                char c = text_chars[i];
-                const uint8_t* byte_data = nullptr;
+    for (int i = 0; text_chars[i] != '\0'; ++i){
+        if(cell_x > 127) break;
+        char c = text_chars[i];
+        const uint8_t* byte_data = nullptr;
 
 
-                if(c < 32 || c > 127) {
-                        byte_data = indexes.characters[0];
+        if(c < 32 || c > 127) {
+            byte_data = indexes.characters[0];
 
-                        while (text_chars[i + 1] != '\0' && text_chars[i + 1] < 32) {
-                                i++;
-                        }
-                }
-                else{
-
-                        byte_data = indexes.characters[(const uint8_t)c];
-                }
-
-
-                memcpy(&framebuffer[1 + cell_x + cell_y], byte_data, 8);
-                cell_x+=8;
+            while (text_chars[i + 1] != '\0' && text_chars[i + 1] < 32) {
+                i++;
+            }
         }
+        else{
+
+            byte_data = indexes.characters[(const uint8_t)c];
+        }
+
+
+        memcpy(&framebuffer[1 + cell_x + cell_y], byte_data, 8);
+        cell_x+=8;
+    }
 
 
 
@@ -380,55 +381,55 @@ void text_display(const char* text_input, int x, int y){
 
 void transparent_text_display(const char* text_input, int x, int y){
 
-        if(y > 7) { y = 7; }
-        if(x > 15) { x = 15; }
+    if(y > 7) { y = 7; }
+    if(x > 15) { x = 15; }
 
-         if(y < 0) { y = 0; }
-        if(x < 0) { x = 0; }
- 
-
-        int string_length = 16;
-        char text_chars[string_length] = {};
-
-        strncpy(text_chars, text_input, 15);
-        text_chars[15] = '\0';
+    if(y < 0) { y = 0; }
+    if(x < 0) { x = 0; }
 
 
-        int cell_x = x * 8;
-        int cell_y = y * 128;
+    int string_length = 16;
+    char text_chars[string_length] = {};
+
+    strncpy(text_chars, text_input, 15);
+    text_chars[15] = '\0';
+
+
+    int cell_x = x * 8;
+    int cell_y = y * 128;
 
 
 
-        for (int i = 0; text_chars[i] != '\0'; ++i){
-                if(cell_x > 127) break;
-                char c = text_chars[i];
-                const uint8_t* byte_data = nullptr;
+    for (int i = 0; text_chars[i] != '\0'; ++i){
+        if(cell_x > 127) break;
+        char c = text_chars[i];
+        const uint8_t* byte_data = nullptr;
 
 
-                if(c < 32 || c > 127) {
-                        byte_data = indexes.characters[0];
+        if(c < 32 || c > 127) {
+            byte_data = indexes.characters[0];
 
-                        while (text_chars[i + 1] != '\0' && text_chars[i + 1] < 32) {
-                                i++;
-                        }
-                }
-                else{
-
-                        byte_data = indexes.characters[(const uint8_t)c];
-                }
-
-
-                
-                for(int col = 0; col<8; col++){
-
-                        int fb_index = 1 + cell_x + cell_y + col;
-                        framebuffer[fb_index] |= byte_data[col];
-
-                }
-
-
-                cell_x+=8;
+            while (text_chars[i + 1] != '\0' && text_chars[i + 1] < 32) {
+                i++;
+            }
         }
+        else{
+
+            byte_data = indexes.characters[(const uint8_t)c];
+        }
+
+
+
+        for(int col = 0; col<8; col++){
+
+            int fb_index = 1 + cell_x + cell_y + col;
+            framebuffer[fb_index] |= byte_data[col];
+
+        }
+
+
+        cell_x+=8;
+    }
 
 
 
@@ -438,45 +439,45 @@ void transparent_text_display(const char* text_input, int x, int y){
 
 void sequential_text_display(const char* text_input, int x, int y, int c_delay){
 
-        if(y > 7) { y = 7; }
-        if(x > 15) { x = 15; }
+    if(y > 7) { y = 7; }
+    if(x > 15) { x = 15; }
 
-        int string_length = 16;
-        char text_chars[string_length] = {};
+    int string_length = 16;
+    char text_chars[string_length] = {};
 
-        strncpy(text_chars, text_input, 15);
-        text_chars[15] = '\0';
-
-
-        int cell_x = x * 8;
-        int cell_y = y * 128;
+    strncpy(text_chars, text_input, 15);
+    text_chars[15] = '\0';
 
 
-
-        for (int i = 0; text_chars[i] != '\0'; ++i){
-                if(cell_x > 127) break;
-                char c = text_chars[i];
-                const uint8_t* byte_data = nullptr;
+    int cell_x = x * 8;
+    int cell_y = y * 128;
 
 
-                if(c < 32 || c > 127) {
-                        byte_data = indexes.characters[0];
 
-                        while (text_chars[i + 1] != '\0' && text_chars[i + 1] < 32) {
-                                i++;
-                        }
-                }
-                else{
-
-                        byte_data = indexes.characters[(const uint8_t)c];
-                }
+    for (int i = 0; text_chars[i] != '\0'; ++i){
+        if(cell_x > 127) break;
+        char c = text_chars[i];
+        const uint8_t* byte_data = nullptr;
 
 
-                memcpy(&framebuffer[1 + cell_x + cell_y], byte_data, 8);
-                flush_display();
-                cell_x+=8;
-                delay(c_delay);
+        if(c < 32 || c > 127) {
+            byte_data = indexes.characters[0];
+
+            while (text_chars[i + 1] != '\0' && text_chars[i + 1] < 32) {
+                i++;
+            }
         }
+        else{
+
+            byte_data = indexes.characters[(const uint8_t)c];
+        }
+
+
+        memcpy(&framebuffer[1 + cell_x + cell_y], byte_data, 8);
+        flush_display();
+        cell_x+=8;
+        delay(c_delay);
+    }
 
 
 
@@ -489,95 +490,95 @@ void sequential_text_display(const char* text_input, int x, int y, int c_delay){
 
 void pixel_display(uint16_t x, uint16_t y){
 
-        if (x < 0 || x >= 128 || y < 0 || y >= 64) return;
+    if (x < 0 || x >= 128 || y < 0 || y >= 64) return;
 
-        uint16_t page = y >> 3;              // y / 8
-        uint16_t bit  = y & 0x07;            // y % 8
-        uint16_t index = page * 128 + x + 1;
+    uint16_t page = y >> 3;              // y / 8
+    uint16_t bit  = y & 0x07;            // y % 8
+    uint16_t index = page * 128 + x + 1;
 
-        framebuffer[index] |= (1 << bit);
+    framebuffer[index] |= (1 << bit);
 
 }
 
 void line_display(int x1, int y1, int x2, int y2){
 
 
-        if (x1 > x2){
-                std::swap(x1, x2);
-                std::swap(y1, y2);
+    if (x1 > x2){
+        std::swap(x1, x2);
+        std::swap(y1, y2);
+    }
+
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+
+    int p = 0;
+    int y = 0;
+
+    int dir_y;
+
+    if(dy < 0) {dir_y = -1;} else {dir_y = 1;}
+
+    dy *= dir_y;
+
+    if(dx>=dy){
+        y = y1;
+
+        p = 2 * dy - dx;
+
+        for(int i = 0; i <= dx; i++){
+            pixel_display(x1 + i, y);
+
+            if (p >= 0){
+                y += dir_y;
+                p = p - 2*dx;
+            }
+
+            p = p + 2*dy;
+
+        }
+
+    }
+    else { 
+
+
+
+        if (y1 > y2){
+            std::swap(x1, x2);
+            std::swap(y1, y2);
         }
 
         int dx = x2 - x1;
         int dy = y2 - y1;
 
         int p = 0;
-        int y = 0;
+        int x = 0;
 
-        int dir_y;
+        int dir_x;
 
-        if(dy < 0) {dir_y = -1;} else {dir_y = 1;}
+        if(dx < 0) {dir_x = -1;} else {dir_x = 1;}
 
-        dy *= dir_y;
+        dx *= dir_x;
 
-        if(dx>=dy){
-                y = y1;
+        if(dy!=0){
+            x = x1;
 
-                p = 2 * dy - dx;
+            p = 2 * dx - dy;
 
-                for(int i = 0; i <= dx; i++){
-                        pixel_display(x1 + i, y);
+            for(int i = 0; i <= dy; i++){
+                pixel_display(x, y1 + i);
 
-                        if (p >= 0){
-                                y += dir_y;
-                                p = p - 2*dx;
-                        }
-
-                        p = p + 2*dy;
-
+                if (p >= 0){
+                    x += dir_x;
+                    p = p - 2*dy;
                 }
+
+                p = p + 2*dx;
+
+            }
 
         }
-        else { 
 
-
-
-                if (y1 > y2){
-                        std::swap(x1, x2);
-                        std::swap(y1, y2);
-                }
-
-                int dx = x2 - x1;
-                int dy = y2 - y1;
-
-                int p = 0;
-                int x = 0;
-
-                int dir_x;
-
-                if(dx < 0) {dir_x = -1;} else {dir_x = 1;}
-
-                dx *= dir_x;
-
-                if(dy!=0){
-                        x = x1;
-
-                        p = 2 * dx - dy;
-
-                        for(int i = 0; i <= dy; i++){
-                                pixel_display(x, y1 + i);
-
-                                if (p >= 0){
-                                        x += dir_x;
-                                        p = p - 2*dy;
-                                }
-
-                                p = p + 2*dx;
-
-                        }
-
-                }
-
-        }
+    }
 
 
 
@@ -586,23 +587,26 @@ void line_display(int x1, int y1, int x2, int y2){
 
 void rectangle_display(int x, int y, int width, int height, bool fill){
 
-        line_display(x, y, x + width, y);
-        line_display(x, y, x, y + height);
+    line_display(x, y, x + width, y);
+    line_display(x, y, x, y + height);
 
-        line_display(x, y + height, x + width, y + height);
-        line_display(x + width, y, x + width, y + height);
+    line_display(x, y + height, x + width, y + height);
+    line_display(x + width, y, x + width, y + height);
 
-        if(fill == true){
-                for (int i = 0; i < height; i++){
-                        line_display(x, y + 1 + i, x + width, y + 1 + i);
-                }
+    if(fill == true){
+        for (int i = 0; i < height; i++){
+            line_display(x, y + 1 + i, x + width, y + 1 + i);
         }
+    }
 
 
 }
 
 void quadrilateral_display(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4){
-    line_display(x1, y1, x2, y2);
+    line_display(x1,y1, x2,y2);
+    line_display(x2,y2, x3,y3);
+    line_display(x3,y3, x4,y4);
+    line_display(x4,y4, x1,y1);
 }
 
 void circle_display(int xc, int yc, int r){
@@ -633,7 +637,7 @@ void circle_display(int xc, int yc, int r){
         }
 
 
-        pixel_display(xc + x, yc + y);
+        pixel_display(xc + x, yc + y); 
         pixel_display(xc - x, yc + y);
         pixel_display(xc + x, yc - y);
         pixel_display(xc - x, yc - y);
@@ -645,19 +649,49 @@ void circle_display(int xc, int yc, int r){
 }
 
 void easy_triangle_display(uint16_t x, uint16_t y, uint16_t base, uint16_t height){
-    
-        line_display(x, y, x + base, y);
-        line_display(x, y, x + (base>>1), y + height);
-        line_display(x + base, y, x + (base>>1), y + height);
+
+    line_display(x, y, x + base, y);
+    line_display(x, y, x + (base>>1), y + height);
+    line_display(x + base, y, x + (base>>1), y + height);
 
 
 }
 
 
 void triangle_display(int x1, int y1, int x2, int y2, int x3, int y3){
-        line_display(x1,y1, x2,y2);
-        line_display(x2,y2, x3,y3);
-        line_display(x3,y3, x1,y1);
+    line_display(x1,y1, x2,y2);
+    line_display(x2,y2, x3,y3);
+    line_display(x3,y3, x1,y1);
 }
 
 
+void image_display(uint8_t image_array[1024]){
+    memcpy(&framebuffer[1], image_array, 1024);
+}
+
+void sprite_display(uint16_t x, uint16_t y, uint8_t *sprite_data, uint16_t width, uint16_t height){
+    uint16_t column_pages = (height + 7) / 8;
+
+    for(uint16_t col = 0; col < width; col++){
+        for(uint16_t page = 0; page < column_pages; page++){
+
+            uint8_t sprite_bytes = sprite_data[col + (page * width)];
+
+            for (uint8_t bit_data= 0; bit_data < 8; bit_data++){
+
+                if((page * 8 + bit_data) >= height){
+                    break;
+                }
+
+                if(sprite_bytes & (1 << bit_data)){
+
+                    pixel_display(x + col, y + (page * 8) + bit_data);
+
+                }
+            
+            }
+
+        }
+    }
+
+}
