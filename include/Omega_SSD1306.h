@@ -16,6 +16,8 @@
 #include<cstdint>
 #include<cstring>
 
+extern int alpha_fd;
+
 extern uint8_t framebuffer[1025];
 
 void init_ascii();
@@ -38,5 +40,7 @@ void circle_display(int xc, int yc, int r);
 void easy_triangle_display(uint16_t x, uint16_t y, uint16_t base, uint16_t height);
 void triangle_display(int x1, int y1, int x2, int y2, int x3, int y3);
 
+void image_display(uint8_t image_array[1024]);
+void sprite_display(uint16_t x, uint16_t y, uint8_t *sprite_data, uint16_t width, uint16_t height);
 #endif
 
