@@ -56,12 +56,10 @@ In your program, you include the library using:
 #include "include/Omega_SSD1306.h"
 ```
 and compile by linking libOmega_SSD1306.a accordingly to your prefered compiler
-(remember to properly format your #include line depending on your project's file tree.
+(remember to properly format your #include line depending on your project's file tree).
 
 
 ## Basic Functions
-###### All available functions are explained in detail at the documentation in 
-##### docs/documentation.md
  
  - init_i2c_display(int address);  -> Used to initialize display, default is 0x3C.
  - init_ascii();               -> Loads available ascii characters on the program.
@@ -69,7 +67,7 @@ and compile by linking libOmega_SSD1306.a accordingly to your prefered compiler
  - pixel_display(int x, int y); -> Turns on a single pixel on the 128x64 canvas.
  - flush_display(); -> Flushes all data stored at the framebuffer. 
  
+ Read [documentation](docs/documentation.md) for full information.
 
  
 
-# Omega_SSD1306
