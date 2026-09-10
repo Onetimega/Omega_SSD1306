@@ -241,7 +241,6 @@ Example:
 ```cpp
 int main(){
     init_i2c_display();
-    init_ascii();
     fb_clear_display();
 
 
@@ -319,7 +318,25 @@ int main(){
 }
 
 ```
+#### sprite_display(uint16_t x, uint16_t y, uint8_t *sprite_data, uint16_t width, uint16_t height);
+Renders an image of given dimensions at indicated coordinates.
 
+Example:
+```cpp
+
+int main(){
+    init_i2c_display(0x3C);
+    fb_clear_display();
+
+    uint8_t alien[24] = {0x80, 0xc0, 0xe8, 0xb0, 0xe0, 0xe0, 0xe0, 0xb0, 0xe8, 0xc0, 0x80,
+    0x00, 0x03, 0x00, 0x03, 0x05, 0x05, 0x01, 0x05, 0x05, 0x03, 0x00, 0x03, 0x00
+    };
+
+    sprite_display(64,32, alien, 12,12);
+    flush_display();
+    }
+
+```
 
 ## License
 
